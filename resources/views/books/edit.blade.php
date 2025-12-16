@@ -1,35 +1,61 @@
     @extends('layouts.app')
+
     @section('content')
     <h2>Edit Book</h2>
 
-
     <form method="POST" action="{{ route('books.update', $book) }}" class="card card-body">
-        @csrf @method('PUT')
-
+        @csrf
+        @method('PUT')
 
         <div class="mb-3">
             <label class="form-label">Title</label>
-            <input name="title" class="form-control" value="{{ $book->title }}" required>
+            <input
+                name="title"
+                class="form-control"
+                value="{{ $book->title }}"
+                required
+            >
         </div>
-
 
         <div class="mb-3">
             <label class="form-label">Author</label>
-            <input name="author" class="form-control" value="{{ $book->author }}" required>
+            <select name="author_id" class="form-control" required>
+                @foreach ($authors as $author)
+                    <option
+                        value="{{ $author->id }}"
+                        {{ $book->author_id == $author->id ? 'selected' : '' }}
+                    >
+                        {{ $author->name }}
+                    </option>
+                @endforeach
+            </select>
         </div>
-
 
         <div class="mb-3">
             <label class="form-label">Category</label>
-            <input name="category" class="form-control" value="{{ $book->category }}" required>
+            <select name="category_id" class="form-control" required>
+                @foreach ($categories as $category)
+                    <option
+                        value="{{ $category->id }}"
+                        {{ $book->category_id == $category->id ? 'selected' : '' }}
+                    >
+                        {{ $category->name }}
+                    </option>
+                @endforeach
+            </select>
         </div>
-
 
         <div class="mb-3">
             <label class="form-label">Stock</label>
-            <input name="stock" type="number" class="form-control" value="{{ $book->stock }}" min="0" required>
+            <input
+                name="stock"
+                type="number"
+                class="form-control"
+                value="{{ $book->stock }}"
+                min="0"
+                required
+            >
         </div>
-
 
         <button class="btn btn-warning">Update</button>
         <a href="{{ route('books.index') }}" class="btn btn-secondary">Cancel</a>

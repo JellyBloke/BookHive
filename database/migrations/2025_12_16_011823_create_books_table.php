@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
             Schema::create('books', function (Blueprint $table) {
-            $table->id(); // BIGINT UNSIGNED
+            $table->id(); 
 
             $table->foreignId('category_id')
                 ->constrained()

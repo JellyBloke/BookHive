@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\Author;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class BookController extends Controller
@@ -12,7 +14,7 @@ class BookController extends Controller
      */
     public function index()
     {
-        $books = Book::latest()->get();
+        $books = Book::with(['author', 'category'])->get();
         return view('books.index', compact('books'));
     }
 
@@ -21,7 +23,10 @@ class BookController extends Controller
      */
     public function create()
     {
-        return view('books.create');
+        $authors = Author::all();
+        $categories = Category::all();
+        return view('books.create', compact('authors', 'categories'));
+        
     }
 
     /**
@@ -30,19 +35,30 @@ class BookController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-        'title' => 'required',
-        'author' => 'required',
-        'category' => 'required',
-        'stock' => 'required|integer|min:0'
+            'title' => 'required',
+            'author_name' => 'required',
+            'category_name' => 'required',
+            'stock' => 'required|integer|min:0',
         ]);
 
+        $author = Author::create([
+            'name' => $request->author_name
+        ]);
 
-        Book::create($request->all());
+        $category = Category::create([
+            'name' => $request->category_name
+        ]);
 
+        Book::create([
+            'title' => $request->title,
+            'author_id' => $author->id,
+            'category_id' => $category->id,
+            'stock' => $request->stock,
+        ]);
 
-        return redirect()->route('books.index')
-        ->with('success', 'Book added successfully');
+        return redirect()->route('books.index');
     }
+
 
     /**
      * Display the specified resource.
@@ -55,9 +71,11 @@ class BookController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
-    {
-        return view('books.edit', compact('book'));
+    public function edit(Book $book)
+    {   
+        $authors = Author::all();
+        $categories = Category::all();
+        return view('books.edit', compact('book', 'authors', 'categories'));
     }
 
     /**
@@ -66,14 +84,19 @@ class BookController extends Controller
     public function update(Request $request, Book $book)
     {
         $request->validate([
-        'title' => 'required',
-        'author' => 'required',
-        'category' => 'required',
-        'stock' => 'required|integer|min:0'
+            'title' => 'required',
+            'author_id' => 'required|exists:authors,id',
+            'category_id' => 'required|exists:categories,id',
+            'stock' => 'required|integer|min:0',
         ]);
 
 
-        $book->update($request->all());
+        $book->update([
+            'title' => $request->title,
+            'author_id' => $request->author_id,
+            'category_id' => $request->category_id,
+            'stock' => $request->stock,
+        ]);
 
 
         return redirect()->route('books.index')
