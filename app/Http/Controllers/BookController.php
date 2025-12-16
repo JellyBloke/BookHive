@@ -63,10 +63,12 @@ class BookController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Book $book)
     {
+        $book->load(['author', 'category', 'borrowings']);
         return view('books.show', compact('book'));
     }
+
 
     /**
      * Show the form for editing the specified resource.

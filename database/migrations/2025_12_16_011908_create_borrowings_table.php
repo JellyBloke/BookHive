@@ -13,8 +13,18 @@ return new class extends Migration
     {
         Schema::create('borrowings', function (Blueprint $table) {
             $table->id();
+
+            $table->foreignId('book_id')
+                ->constrained()
+                ->cascadeOnDelete();
+
+            $table->string('borrower_name');
+            $table->date('borrowed_at');
+            $table->date('returned_at')->nullable();
+
             $table->timestamps();
         });
+
     }
 
     /**
