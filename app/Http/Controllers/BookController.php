@@ -6,6 +6,7 @@ use App\Models\Book;
 use App\Models\Author;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class BookController extends Controller
 {
@@ -26,7 +27,6 @@ class BookController extends Controller
         $authors = Author::all();
         $categories = Category::all();
         return view('books.create', compact('authors', 'categories'));
-        
     }
 
     /**
@@ -34,29 +34,42 @@ class BookController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required',
+        $rules = [
+            'title' => 'required|unique:books',
             'author_name' => 'required',
             'category_name' => 'required',
-            'stock' => 'required|integer|min:0',
-        ]);
+            'stock' => 'required|numeric|min:1'
+        ];
 
-        $author = Author::create([
-            'name' => $request->author_name
-        ]);
+        $messages = [
+            'required' => ':attribute must not be empty.',
+            'unique' => 'This :attribute has already exist.',
+            'numeric' => ':attribute must be numeric.',
+            'min' => ':attribute must be at least :min.'
+        ];
 
-        $category = Category::create([
-            'name' => $request->category_name
-        ]);
+        $validator = Validator::make($request->all(), $rules, $messages);
 
-        Book::create([
-            'title' => $request->title,
-            'author_id' => $author->id,
-            'category_id' => $category->id,
-            'stock' => $request->stock,
-        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator)->with('danger', 'All fields must be filled in.');
+        } else {
+            $author = Author::firstOrCreate([
+                'name' => $request->author_name
+            ]);
 
-        return redirect()->route('books.index');
+            $category = Category::firstOrCreate([
+                'name' => $request->category_name
+            ]);
+
+            Book::create([
+                'title' => $request->title,
+                'author_id' => $author->id,
+                'category_id' => $category->id,
+                'stock' => $request->stock,
+            ]);
+
+            return redirect()->route('books.index');
+        }
     }
 
 
@@ -85,24 +98,34 @@ class BookController extends Controller
      */
     public function update(Request $request, Book $book)
     {
-        $request->validate([
-            'title' => 'required',
-            'author_id' => 'required|exists:authors,id',
-            'category_id' => 'required|exists:categories,id',
-            'stock' => 'required|integer|min:0',
-        ]);
+        $rules = [
+            'title' => 'required|unique:books,title,' . $book->id,
+            'author_name' => 'required',
+            'category_name' => 'required',
+            'stock' => 'required|numeric|min:0'
+        ];
 
+        $messages = [
+            'required' => ':attribute must not be empty.',
+            'unique' => 'This :attribute has already exist.',
+            'numeric' => ':attribute must be numeric.',
+            'min' => ':attribute must be at least :min.'
+        ];
 
-        $book->update([
-            'title' => $request->title,
-            'author_id' => $request->author_id,
-            'category_id' => $request->category_id,
-            'stock' => $request->stock,
-        ]);
+        $validator = Validator::make($request->all(), $rules, $messages);
 
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator)->with('danger', 'All fields must be filled in.');
+        } else {
+            $book->update([
+                'title' => $request->title,
+                'author_id' => $request->author_name,
+                'category_id' => $request->category_name,
+                'stock' => $request->stock
+            ]);
 
-        return redirect()->route('books.index')
-        ->with('success', 'Book updated successfully');
+            return redirect()->route('books.index')->with('success', 'The book has been successfully edited.');
+        }
     }
 
     /**
@@ -112,7 +135,6 @@ class BookController extends Controller
     {
         $book->delete();
 
-        return redirect()->route('books.index')
-        ->with('success', 'Book deleted successfully');
+        return redirect()->route('books.index')->with('success', 'The book has been deleted successfully.');
     }
 }
