@@ -30,4 +30,18 @@ class Book extends Model
     public function borrowings() {
         return $this->hasMany(Borrowing::class);
     }
+
+    public function wishlistedBy()
+    {
+        return $this->belongsToMany(User::class, 'wishlists')->withTimestamps();
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    
+
+
 }

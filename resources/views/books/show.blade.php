@@ -19,6 +19,33 @@
                     </span>
                 </div>
 
+                @auth
+                <div>
+                    @if (auth()->user()->wishlistBooks->contains($book->id))
+                        <form method="POST" action="{{ route('wishlist.remove', $book) }}">
+                            @csrf
+                            @method('DELETE')
+                            <button class="btn btn-outline-danger">
+                                ❌ Remove from Wishlist
+                            </button>
+                        </form>
+                    @else
+                        <form method="POST" action="{{ route('wishlist.add', $book) }}">
+                            @csrf
+                            <button class="btn btn-outline-primary">
+                                ❤️ Add to Wishlist
+                            </button>
+                        </form>
+                    @endif
+                </div>
+                    @else
+                        <div class="alert alert-info m-0">
+                            Login to add this book to your wishlist.
+                        </div>
+                @endauth
+
+
+
                 <a href="{{ route('books.index') }}" class="btn btn-secondary">Back</a>
             </div>
         </div>
@@ -89,6 +116,67 @@
                 @else
                     <div class="text-muted">No borrow history.</div>
                 @endif
+            </div>
+        </div>
+
+        <div class="card">
+        <div class="card-body p-4 pt-3 d-flex flex-column gap-3">
+            <h5 class="m-0">Reviews</h5>
+
+            {{-- Review form --}}
+            @auth
+                <form method="POST" action="{{ route('books.review', $book) }}">
+                    @csrf
+
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-2">
+                            <label class="form-label">Rating</label>
+                            <select name="rating" class="form-select" required>
+                                <option value="">Select</option>
+                                @for ($i = 1; $i <= 5; $i++)
+                                    <option value="{{ $i }}">{{ $i }} ⭐</option>
+                                @endfor
+                            </select>
+                        </div>
+
+                        <div class="col-md-8">
+                            <label class="form-label">Comment</label>
+                            <textarea name="comment" class="form-control" placeholder="Write your review..."></textarea>
+                        </div>
+
+                        <div class="col-md-2">
+                            <button class="btn btn-primary w-100">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            @else
+                <div class="alert alert-info m-0">
+                    Login to write a review.
+                </div>
+            @endauth
+
+            <hr>
+
+            {{-- Review list --}}
+            @if ($book->reviews->count())
+                <div class="d-flex flex-column gap-3">
+                    @foreach ($book->reviews as $review)
+                        <div class="border rounded p-3">
+                            <div class="d-flex justify-content-between">
+                                <strong>{{ $review->user->name }}</strong>
+                                <span class="text-warning">
+                                    {{ str_repeat('⭐', $review->rating) }}
+                                </span>
+                            </div>
+                            @if ($review->comment)
+                                <p class="mb-0 mt-2">{{ $review->comment }}</p>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="text-muted">No reviews yet.</div>
+            @endif
             </div>
         </div>
     </div>
