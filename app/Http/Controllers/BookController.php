@@ -15,7 +15,7 @@ class BookController extends Controller
      */
     public function index()
     {
-        $books = Book::with(['author', 'category'])->get();
+        $books = Book::with(['author', 'category'])->paginate(10);
         return view('books.index', compact('books'));
     }
 
@@ -37,7 +37,7 @@ class BookController extends Controller
         $rules = [
             'title' => 'required|unique:books',
             'author_name' => 'required',
-            'category_name' => 'required',
+            'category' => 'required|not_in:0',
             'stock' => 'required|numeric|min:1'
         ];
 
@@ -57,14 +57,10 @@ class BookController extends Controller
                 'name' => $request->author_name
             ]);
 
-            $category = Category::firstOrCreate([
-                'name' => $request->category_name
-            ]);
-
             Book::create([
                 'title' => $request->title,
                 'author_id' => $author->id,
-                'category_id' => $category->id,
+                'category_id' => $request->category,
                 'stock' => $request->stock,
             ]);
 
@@ -99,10 +95,10 @@ class BookController extends Controller
     public function update(Request $request, Book $book)
     {
         $rules = [
-            'title' => 'required|unique:books,title,' . $book->id,
+            'title' => 'required',
             'author_name' => 'required',
-            'category_name' => 'required',
-            'stock' => 'required|numeric|min:0'
+            'category' => 'required|not_in:0',
+            'stock' => 'required|numeric|min:1'
         ];
 
         $messages = [
@@ -120,7 +116,7 @@ class BookController extends Controller
             $book->update([
                 'title' => $request->title,
                 'author_id' => $request->author_name,
-                'category_id' => $request->category_name,
+                'category_id' => $request->category,
                 'stock' => $request->stock
             ]);
 

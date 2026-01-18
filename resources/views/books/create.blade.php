@@ -3,7 +3,7 @@
 
 @section('content')
     <div class="d-flex flex-column p-4 gap-3">
-        <h2>Add New Book</h2>
+        <h2 class="m-0 fw-semibold fs-2">Add New Book</h2>
 
         @include('partial.success-alert')
         <form method="POST" action="{{ route('books.store') }}" class="card card-body p-4 pt-3">
@@ -32,10 +32,15 @@
                     </div>
 
                     <div>
-                        <label class="form-label" for="category_name">Category</label>
-                        <input name="category_name" class="form-control @error('category_name') is-invalid @enderror" id="category_name" value="{{ old('category_name') }}">
-                        @error('category_name')
-                            <div class="invalid-feedback" role="alert">
+                        <label class="form-label" for="category">Category</label>
+                        <select class="form-control @error('category') is-invalid @enderror" name="category" id="category">
+                            <option value="" disabled selected hidden>-- Choose Category --</option>
+                            @foreach ($categories as $category)
+                                <option value="{{ $category->id }}" {{ old('category') == $category->id ? 'selected':'' }}>{{ $category->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('category')
+                            <div class="invalid-feedback" role='alert'>
                                 {{ $message }}
                             </div>
                         @enderror
@@ -54,7 +59,7 @@
 
                 <div class="d-flex justify-content-center gap-3">
                     <button type="submit" class="btn btn-success" style="width: 7rem; max-width: 100%;">Save</button>
-                    <a href="{{ route('books.index') }}" class="btn btn-secondary" style="width: 7rem; max-width: 100%;">Cancel</a>
+                    <a href="{{ route('home') }}" class="btn btn-secondary" style="width: 7rem; max-width: 100%;">Cancel</a>
                 </div>
             </div>
         </form>

@@ -12,14 +12,14 @@ class WishlistController extends Controller
     {
         $user = Auth::user();
 
-        $user->wishlist()->toggle($book->id);
+        $user->wishlistBooks()->toggle($book->id);
 
         return back();
     }
 
     public function index()
     {
-        $books = Auth::user()->wishlist()->with('author','category')->get();
+        $books = Auth::user()->wishlistBooks()->with('author','category')->get();
         return view('wishlist.index', compact('books'));
     }
 }

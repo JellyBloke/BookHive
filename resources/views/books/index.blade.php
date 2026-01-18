@@ -4,8 +4,10 @@
 @section('content')
     <div class="d-flex flex-column p-4 gap-3">
         <div class="d-flex justify-content-between">
-            <h2 class="m-0">Book List</h2>
-            <a href="{{ route('books.create') }}" class="btn btn-primary align-self-end" style="width: 7rem; max-width: 100%;">+ Add Book</a>
+            <h2 class="m-0 fw-semibold fs-2">Book List</h2>
+            @if (auth()->user()->role === 'admin')
+                <a href="{{ route('books.create') }}" class="btn btn-primary align-self-end" style="width: 7rem; max-width: 100%;">+ Add Book</a>
+            @endif
         </div>
 
         <div class="table-responsive">
@@ -36,12 +38,14 @@
                             <td>
                                 <div class="d-flex justify-content-center gap-2">
                                     <a href="{{ route('books.show', $book) }}" class="btn btn-info btn-sm" style="width: 4rem; max-width: 100%;">View</a>
-                                    <a href="{{ route('books.edit', $book) }}" class="btn btn-warning btn-sm" style="width: 4rem; max-width: 100%;">Edit</a>
-                                    <form action="{{ route('books.destroy', $book) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm" style="width: 4rem; max-width: 100%;" onclick="return confirm('Are you sure you want to delete this book?')">Delete</button>
-                                    </form>
+                                    @if (auth()->user()->role === 'admin')
+                                        <a href="{{ route('books.edit', $book) }}" class="btn btn-warning btn-sm" style="width: 4rem; max-width: 100%;">Edit</a>
+                                        <form action="{{ route('books.destroy', $book) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm" style="width: 4rem; max-width: 100%;" onclick="return confirm('Are you sure you want to delete this book?')">Delete</button>
+                                        </form>
+                                    @endif
                                 </div>
                                 
                             </td>
@@ -49,6 +53,9 @@
                     @endforeach
                 </tbody>
             </table>
+        </div>
+        <div class="row">
+            {{ $books->links() }}
         </div>
     </div>
 @endsection

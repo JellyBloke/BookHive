@@ -8,7 +8,7 @@
 
         <div class="card">
             <div class="card-body p-4 pt-3 d-flex flex-column gap-3">
-                <h3 class="m-0">{{ $book->title }}</h3>
+                <h3 class="m-0 fw-semibold fs-3">{{ $book->title }}</h3>
 
                 <div><strong>Author:</strong> {{ $book->author->name }}</div>
                 <div><strong>Category:</strong> {{ $book->category->name }}</div>
@@ -22,26 +22,29 @@
                 @auth
                 <div>
                     @if (auth()->user()->wishlistBooks->contains($book->id))
-                        <form method="POST" action="{{ route('wishlist.remove', $book) }}">
+                        
+                        <form method="POST" action="{{ route('wishlist.toggle', $book) }}">
                             @csrf
-                            @method('DELETE')
                             <button class="btn btn-outline-danger">
                                 ❌ Remove from Wishlist
                             </button>
                         </form>
+
                     @else
-                        <form method="POST" action="{{ route('wishlist.add', $book) }}">
+                        
+                        <form method="POST" action="{{ route('wishlist.toggle', $book) }}">
                             @csrf
                             <button class="btn btn-outline-primary">
                                 ❤️ Add to Wishlist
                             </button>
                         </form>
+
                     @endif
                 </div>
-                    @else
-                        <div class="alert alert-info m-0">
-                            Login to add this book to your wishlist.
-                        </div>
+                @else
+                    <div class="alert alert-info m-0">
+                        Login to add this book to your wishlist.
+                    </div>
                 @endauth
 
 
@@ -123,12 +126,11 @@
         <div class="card-body p-4 pt-3 d-flex flex-column gap-3">
             <h5 class="m-0">Reviews</h5>
 
-            {{-- Review form --}}
             @auth
                 <form method="POST" action="{{ route('books.review', $book) }}">
                     @csrf
 
-                    <div class="row g-2 align-items-end">
+                    <div class="row g-2">
                         <div class="col-md-2">
                             <label class="form-label">Rating</label>
                             <select name="rating" class="form-select" required>
@@ -144,7 +146,7 @@
                             <textarea name="comment" class="form-control" placeholder="Write your review..."></textarea>
                         </div>
 
-                        <div class="col-md-2">
+                        <div class="col-md-2 align-self-center">
                             <button class="btn btn-primary w-100">Submit</button>
                         </div>
                     </div>
@@ -157,7 +159,6 @@
 
             <hr>
 
-            {{-- Review list --}}
             @if ($book->reviews->count())
                 <div class="d-flex flex-column gap-3">
                     @foreach ($book->reviews as $review)

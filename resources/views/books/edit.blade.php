@@ -3,7 +3,7 @@
 
 @section('content')
     <div class="d-flex flex-column p-4 gap-3">
-        <h2>Edit Book</h2>
+        <h2 class="m-0 fw-semibold fs-2">Edit Book</h2>
 
         @include('partial.danger-alert')
         <form method="POST" action="{{ route('books.update', $book) }}" class="card card-body p-4 pt-3">
@@ -24,13 +24,7 @@
 
                     <div>
                         <label class="form-label" for="author_name">Author</label>
-                        <select name="author_name" class="form-control @error('author_name') is-invalid @enderror" id="author_name">
-                            @foreach ($authors as $author)
-                                <option value="{{ $author->id }}" {{ $book->author_id == $author->id ? 'selected' : '' }}>
-                                    {{ $author->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <input name="author_name" class="form-control @error('author_name') is-invalid @enderror" id="author_name" value="{{ $book->author->name }}">
                         @error('author_name')
                             <div class="invalid-feedback" role="alert">
                                 {{ $message }}
@@ -39,16 +33,17 @@
                     </div>
 
                     <div>
-                        <label class="form-label" for="category_name">Category</label>
-                        <select name="category_name" class="form-control @error('category_name') is-invalid @enderror" id="category_name">
+                        <label class="form-label" for="category">Category</label>
+                        <select class="form-control @error('category') is-invalid @enderror" name="category" id="category">
+                            <option value="" disabled selected hidden>-- Choose Category --</option>
                             @foreach ($categories as $category)
-                                <option value="{{ $category->id }}" {{ $book->category_id == $category->id ? 'selected' : '' }}>
-                                    {{ $category->name }}
-                                </option>
+                            <option value="{{ $category->id }}" {{ $book->category_id == $category->id ? 'selected' : '' }}>
+                                {{ $category->name }}
+                            </option>
                             @endforeach
                         </select>
-                        @error('category_name')
-                            <div class="invalid-feedback" role="alert">
+                        @error('category')
+                            <div class="invalid-feedback" role='alert'>
                                 {{ $message }}
                             </div>
                         @enderror

@@ -16,6 +16,13 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => RoleMiddleware::class
         ]);
 
+        $middleware->redirectUsersTo(function () {
+            $user = Auth::user();
+            if ($user) {
+                return route('books.index');
+            }
+        });
+
         $middleware->web(append:[
             App\Http\Middleware\LocalizationMiddleware::class
         ]);
